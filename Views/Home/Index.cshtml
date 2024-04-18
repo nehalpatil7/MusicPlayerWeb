@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "PLAY";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to the world of Music</h1>
+</div>
+
+<div>
+    @if (ViewBag.Message != null)
+    {
+        <p>@ViewBag.Message</p>
+    }
+    else
+    {
+        <br>
+        <h2>Tracks...</h2>
+        <ul id="musicList">
+            @foreach (var musicFile in ViewBag.MusicFiles)
+            {
+                <li class="musicItem" data-music="@musicFile">@musicFile</li>
+            }
+        </ul>
+
+        @* <audio id="musicPlayer" preload="auto" autoplay controls src="">
+        </audio> *@
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const musicItems = document.querySelectorAll('.musicItem');
+
+            musicItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    const selectedMusicFile = this.getAttribute('data-music');
+
+                    fetch(`/home/play?musicFile=${encodeURIComponent(selectedMusicFile)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                var musicPlayer = document.getElementById('musicPlayer');
+                                musicPlayer.src = "/Users/npatil14/Downloads/Movies/Music/" + data.musicFile;
+                                musicPlayer.load();
+                                musicPlayer.play();
+                            } else {
+                                console.error(data.message);
+                            }
+                        })
+                        .catch(error => console.error('Error playing music:', error));
+
+                });
+            });
+        });
+    </script>
+}
